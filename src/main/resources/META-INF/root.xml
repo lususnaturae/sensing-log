@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-http="http://www.springframework.org/schema/integration/http"
+       xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+       xmlns:amq="http://activemq.apache.org/schema/core"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+               http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+               http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.2.xsd
+               http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+	           http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
+               http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-4.2.xsd
+               http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd
+
+        ">
+
+
+    <context:component-scan base-package="com.ylitormatech.sensinglog">
+        <context:exclude-filter expression="org.springframework.stereotype.Controller" type="annotation"/>
+    </context:component-scan>
+
+
+    <bean id="application.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:app.properties</value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+
+    <bean id="myEmf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="packagesToScan" value="com.ylitormatech.sensinglog" />
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+        </property>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.hbm2ddl.auto">${app.hbm2ddl.auto}</prop>
+                <prop key="hibernate.dialect">${app.hibernate.dialect}</prop>
+                <prop key="hibernate.connection.useUnicode">true</prop>
+                <prop key="hibernate.connection.characterEncoding">utf8</prop>
+                <prop key="hibernate.connection.charSet">utf8</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${app.db.driver}" />
+        <property name="url" value="${app.db.url}" />
+        <property name="username" value="${app.db.user}" />
+        <property name="password" value="${app.db.password}" />
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="myEmf" />
+    </bean>
+
+
+
+
+    <int:annotation-config/>
+
+    <!-- Inbound/Outbound Channels -->
+    <int:channel id="httpGatewayRequest" />
+    <int:channel id="httpGatewayResponse" />
+
+
+    <int-http:inbound-gateway id="inboundRequestGateway"
+                              supported-methods="POST"
+                              request-channel="httpGatewayRequest"
+                              reply-channel="httpGatewayResponse"
+                              request-payload-type="java.lang.String"
+                              mapped-response-headers="Return-Status, Return-Status-Msg, HTTP_RESPONSE_HEADERS"
+                              path="/sensor"
+                              reply-timeout="5000"  >
+
+        <!--- {id}" -->
+
+        <!--- <int-http:header name="employeeId" expression="#pathVariables.id"></int-http:header> -->
+
+        <int-http:request-mapping consumes="application/json" produces="application/json"/>
+
+        <int-http:cross-origin origin="*"></int-http:cross-origin>
+
+     </int-http:inbound-gateway>
+
+
+    <int:service-activator id="sensorServiceActivator"
+                           input-channel="httpGatewayRequest"
+                           output-channel="httpGatewayResponse"
+                           ref="messagingEndpoint"
+                           method="sensorHttpPost"
+                           requires-reply="true"
+                           send-timeout="60000"/>
+
+    <!-- INTEGRATION TO JMS AND BEARER IS ACTIVEMQ -->
+
+    <!-- Activemq connection factory -->
+    <bean id="amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <!-- brokerURL, You may have different IP or port -->
+        <constructor-arg index="0" value="tcp://127.0.0.1:61616" />
+    </bean>
+
+    <!-- Pooled Spring connection factory -->
+    <bean id="connectionFactory"
+          class="org.springframework.jms.connection.CachingConnectionFactory">
+        <constructor-arg ref="amqConnectionFactory" />
+    </bean>
+
+
+    <!--  lets create an embedded ActiveMQ Broker -->
+    <amq:broker useJmx="false" persistent="false">
+        <amq:transportConnectors>
+            <amq:transportConnector uri="tcp://127.0.0.1:61616" />
+        </amq:transportConnectors>
+    </amq:broker>
+
+    <amq:queue name="amqueue" physicalName="xQ" />
+
+
+    <int-jms:inbound-gateway  request-channel="inQueue" request-destination-name="xQ" id="jsmInG"/>
+
+    <!--
+   <int-jms:message-driven-channel-adapter  receive-timeout="10000"  id="jmsIn"  destination-name="xQ"  channel="inQueue" />
+-->
+
+    <int:publish-subscribe-channel  id="inQueue"  />
+
+
+    <int:service-activator input-channel="inQueue" send-timeout="1000" requires-reply="true" ref="messagingEndpoint" method="receive"/>
+
+
+
+</beans>
