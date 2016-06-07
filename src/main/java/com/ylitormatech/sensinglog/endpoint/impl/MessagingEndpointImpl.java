@@ -6,12 +6,12 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.ylitormatech.sensinglog.endpoint.MessagingEndpoint;
 import com.ylitormatech.sensinglog.service.ApiKeyService;
 import com.ylitormatech.sensinglog.service.SensorService;
-import com.ylitormatech.sensinglog.service.data.Calendar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
+
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -30,6 +30,18 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
 
     @Autowired
     ApiKeyService apiKeyService;
+
+
+    public String newApiKey(String message) {
+        /*
+        *  Here comes ApiKey handling
+        */
+        apiKeyService.createApiKey(message);
+
+        System.out.println("OK OK OK OK OK OK " + message);
+        return "OK";
+    }
+
 
     public String receive(String message) {
         /*
@@ -59,7 +71,10 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
         }
 
         if(map.containsKey("id") && map.containsKey("value")) {
-            if(apiKeyService.getAPIKeyId(map.get("id"))) {
+            String key = map.get("id");
+
+            boolean isUsed = apiKeyService.getAPIKeyId(key);
+            if(isUsed) {
                 sensorService.createSensorDataEntity(map.get("id"), map.get("value"));
                 return MessageBuilder.withPayload("ok")
                         .copyHeadersIfAbsent(msg.getHeaders())

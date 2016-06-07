@@ -9,5 +9,7 @@ public interface MessagingEndpoint {
 
     public String receive(String message);
 
+    public String newApiKey(String message);
+
     public Message<String> sensorHttpPost(Message<String> msg);
 }

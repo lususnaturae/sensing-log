@@ -8,4 +8,5 @@ import com.ylitormatech.sensinglog.data.entity.ApiKeyEntity;
 public interface ApiKeyRepository {
 
     public void add(ApiKeyEntity apiKeyEntity);
+    public ApiKeyEntity find(String apikey);
 }

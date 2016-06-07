@@ -136,10 +136,25 @@
 -->
 
     <int:publish-subscribe-channel  id="inQueue"  />
+    <int:channel id="dataChannel"/>
+    <int:channel id="newApiKeyChannel"/>
 
 
-    <int:service-activator input-channel="inQueue" send-timeout="1000" requires-reply="true" ref="messagingEndpoint" method="receive"/>
+    <int:header-value-router input-channel="inQueue" default-output-channel="dataChannel" header-name="Action">
+        <int:mapping value="New" channel="newApiKeyChannel" />
+    </int:header-value-router>
 
 
+    <int:service-activator input-channel="dataChannel"
+                           send-timeout="1000"
+                           requires-reply="true"
+                           ref="messagingEndpoint"
+                           method="receive"/>
+
+    <int:service-activator input-channel="newApiKeyChannel"
+                           send-timeout="1000"
+                           requires-reply="true"
+                           ref="messagingEndpoint"
+                           method="newApiKey"/>
 
 </beans>

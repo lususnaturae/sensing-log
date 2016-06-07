@@ -1,11 +1,13 @@
 package com.ylitormatech.sensinglog.data.entity;
 
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 /**
  * Created by Perttu Vanharanta on 1.6.2016.
  */
+@Entity
 public class ApiKeyEntity {
 
     @Id

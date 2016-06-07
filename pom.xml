@@ -176,8 +176,8 @@
         <version>2.2</version>
         <configuration>
           <path>/</path>
-          <port>8888</port>
-          <ajpPort>8009</ajpPort>
+          <port>9888</port>
+          <ajpPort>8019</ajpPort>
         </configuration>
       </plugin>
     </plugins>
