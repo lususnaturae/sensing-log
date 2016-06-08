@@ -129,18 +129,39 @@
     <amq:queue name="amqueue" physicalName="xQ" />
     <int-jms:inbound-gateway  request-channel="inQueue" request-destination-name="xQ" id="jsmInG"/>
 
+    <!--
     <amq:queue name="amqueue_sens" physicalName="sensorit01" />
     <int-jms:inbound-gateway  request-channel="inQueue" request-destination-name="sensorit01" id="jsmInG_sens"/>
-
+    -->
     <!--
    <int-jms:message-driven-channel-adapter  receive-timeout="10000"  id="jmsIn"  destination-name="xQ"  channel="inQueue" />
--->
+    -->
 
     <int:publish-subscribe-channel  id="inQueue"  />
 
-
     <int:service-activator input-channel="inQueue" send-timeout="1000" requires-reply="true" ref="messagingEndpoint" method="receive"/>
 
+    <!-- Second connection factory setup for sensors messaging raw data into the onLog. -->
 
+    <!-- Activemq connection factory -->
+    <!--
+    <bean id="amqConnectionFactory_sens" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <constructor-arg index="0" value="tcp://127.0.0.1:61616" />
+    </bean>
+    <bean id="connectionFactory_sens"
+          class="org.springframework.jms.connection.CachingConnectionFactory">
+        <constructor-arg ref="amqConnectionFactory_sens" />
+    </bean>
+
+    <amq:broker useJmx="false" persistent="false">
+        <amq:transportConnectors>
+            <amq:transportConnector uri="tcp://127.0.0.1:61616" />
+        </amq:transportConnectors>
+    </amq:broker>
+    -->
+    <amq:queue name="amqueue_sens" physicalName="sensorit01" />
+    <int-jms:inbound-gateway  request-channel="inQueue_sens" request-destination-name="sensorit01" id="jsmInG_sens"/>
+    <int:publish-subscribe-channel  id="inQueue_sens"  />
+    <int:service-activator input-channel="inQueue_sens" send-timeout="1000" requires-reply="true" ref="messagingSensorEP" method="receive"/>
 
 </beans>
