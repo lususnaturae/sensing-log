@@ -7,7 +7,12 @@ import org.springframework.messaging.Message;
  */
 public interface MessagingEndpoint {
 
-    public String receive(String message);
+    public String receiveData(String message);
+
+    public String newApiKey(String message);
+    public String removeApiKey(String message);
+    public String activateApiKey(String message);
+    public String deactivateApiKey(String message);
 
     public Message<String> sensorHttpPost(Message<String> msg);
 }

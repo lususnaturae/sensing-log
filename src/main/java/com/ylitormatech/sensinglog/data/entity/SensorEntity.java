@@ -6,10 +6,12 @@ import org.joda.time.DateTime;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Created by Perttu Vanharanta on 1.6.2016.
  */
+@Table
 @Entity
 public class SensorEntity {
     @Id

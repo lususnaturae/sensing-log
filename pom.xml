@@ -85,7 +85,32 @@
       <version>5.7.0</version>
     </dependency>
 
+    <!-- LOGGING -->
 
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>1.7.0</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.0</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
+    </dependency>
 
     <!-- joda time -->
     <dependency>
@@ -176,8 +201,8 @@
         <version>2.2</version>
         <configuration>
           <path>/</path>
-          <port>8888</port>
-          <ajpPort>8009</ajpPort>
+          <port>9888</port>
+          <ajpPort>8019</ajpPort>
         </configuration>
       </plugin>
     </plugins>
