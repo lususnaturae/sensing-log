@@ -127,9 +127,10 @@
     </amq:broker>
 
     <amq:queue name="amqueue" physicalName="xQ" />
-
-
     <int-jms:inbound-gateway  request-channel="inQueue" request-destination-name="xQ" id="jsmInG"/>
+
+    <amq:queue name="amqueue_sens" physicalName="sensorit01" />
+    <int-jms:inbound-gateway  request-channel="inQueue" request-destination-name="sensorit01" id="jsmInG_sens"/>
 
     <!--
    <int-jms:message-driven-channel-adapter  receive-timeout="10000"  id="jmsIn"  destination-name="xQ"  channel="inQueue" />
