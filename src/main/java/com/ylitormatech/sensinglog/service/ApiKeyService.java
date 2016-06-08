@@ -5,5 +5,7 @@ package com.ylitormatech.sensinglog.service;
  */
 public interface ApiKeyService {
     public void createApiKey(String key);
+    public void removeApiKey(String key);
+    public void updateApiKey(String key, boolean isActivated);
     public boolean getAPIKeyId(String id);
 }

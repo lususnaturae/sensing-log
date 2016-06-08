@@ -49,6 +49,7 @@
                 <prop key="hibernate.connection.useUnicode">true</prop>
                 <prop key="hibernate.connection.characterEncoding">utf8</prop>
                 <prop key="hibernate.connection.charSet">utf8</prop>
+                <prop key="hibernate.show_sql">true</prop>
             </props>
         </property>
     </bean>
@@ -138,10 +139,15 @@
     <int:publish-subscribe-channel  id="inQueue"  />
     <int:channel id="dataChannel"/>
     <int:channel id="newApiKeyChannel"/>
-
+    <int:channel id="removeApiKeychannel"/>
+    <int:channel id="activateApiKeyChannel"/>
+    <int:channel id="deactivateApiKeyChannel"/>
 
     <int:header-value-router input-channel="inQueue" default-output-channel="dataChannel" header-name="Action">
         <int:mapping value="New" channel="newApiKeyChannel" />
+        <int:mapping value="Remove" channel="removeApiKeychannel"/>
+        <int:mapping value="Activate" channel="activateApiKeyChannel"/>
+        <int:mapping value="Deactivate" channel="deactivateApiKeyChannel"/>
     </int:header-value-router>
 
 
@@ -149,12 +155,33 @@
                            send-timeout="1000"
                            requires-reply="true"
                            ref="messagingEndpoint"
-                           method="receive"/>
+                           method="receiveData"/>
 
     <int:service-activator input-channel="newApiKeyChannel"
                            send-timeout="1000"
                            requires-reply="true"
                            ref="messagingEndpoint"
                            method="newApiKey"/>
+
+    <int:service-activator input-channel="removeApiKeychannel"
+                           send-timeout="1000"
+                           requires-reply="true"
+                           ref="messagingEndpoint"
+                           method="removeApiKey"/>
+
+    <int:service-activator input-channel="activateApiKeychannel"
+                           send-timeout="1000"
+                           requires-reply="true"
+                           ref="messagingEndpoint"
+                           method="activateApiKey"/>
+
+    <int:service-activator input-channel="deactivateApiKeychannel"
+                           send-timeout="1000"
+                           requires-reply="true"
+                           ref="messagingEndpoint"
+                           method="deactivateApiKey"/>
+
+
+
 
 </beans>

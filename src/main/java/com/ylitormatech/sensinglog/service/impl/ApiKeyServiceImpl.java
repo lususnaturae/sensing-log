@@ -20,16 +20,24 @@ public class ApiKeyServiceImpl implements ApiKeyService{
     public void createApiKey(String key) {
         ApiKeyEntity apiKeyEntity = new ApiKeyEntity();
         apiKeyEntity.setApikey(key);
+        apiKeyEntity.setActivate(true);
         apiKeyRepository.add(apiKeyEntity);
     }
 
     @Transactional(readOnly = false)
+    public void removeApiKey(String key){
+        apiKeyRepository.remove(key);
+    }
+
+    @Transactional(readOnly = false)
+    public void updateApiKey(String key, boolean isActivated){
+        ApiKeyEntity apiKeyEntity = apiKeyRepository.findEntity(key);
+        apiKeyEntity.setActivate(isActivated);
+        apiKeyRepository.update(apiKeyEntity);
+    }
+
+    @Transactional(readOnly = true)
     public boolean getAPIKeyId(String id){
-        ApiKeyEntity apiKeyEntity;
-        apiKeyEntity = apiKeyRepository.find(id);
-        if(apiKeyEntity != null){
-            return true;
-        }
-        return false;
+        return apiKeyRepository.find(id);
     }
 }

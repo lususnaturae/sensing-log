@@ -3,10 +3,12 @@ package com.ylitormatech.sensinglog.data.entity;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Created by Perttu Vanharanta on 1.6.2016.
  */
+@Table
 @Entity
 public class ApiKeyEntity {
 
@@ -15,6 +17,8 @@ public class ApiKeyEntity {
     Integer id;
 
     String apikey;
+
+    boolean isActivate;
 
     public Integer getId() {
         return id;
@@ -30,5 +34,13 @@ public class ApiKeyEntity {
 
     public void setApikey(String apikey) {
         this.apikey = apikey;
+    }
+
+    public boolean isActivate() {
+        return isActivate;
+    }
+
+    public void setActivate(boolean activate) {
+        isActivate = activate;
     }
 }
