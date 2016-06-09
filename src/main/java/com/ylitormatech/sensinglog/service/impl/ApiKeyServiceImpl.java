@@ -20,7 +20,7 @@ public class ApiKeyServiceImpl implements ApiKeyService{
         */
     }
 
-    public boolean getAPIKeyId(String id) {
+    public boolean findAPIKeyId(String id) {
         /*
         * Find apikey from database. If found return true else false
         */

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.ylitormatech.sensinglog.endpoint.MessagingEndpoint;
 import com.ylitormatech.sensinglog.service.ApiKeyService;
 import com.ylitormatech.sensinglog.service.SensorService;
-import com.ylitormatech.sensinglog.service.data.Calendar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.support.MessageBuilder;
@@ -19,6 +18,8 @@ import java.util.Map;
 
 /**
  * Created by Perttu Vanharanta on 1.6.2016.
+ *
+ * This module handle HTTP-messages (request) from Sensing World.
  */
 @Component("messagingEndpoint")
 public class MessagingEndpointImpl implements MessagingEndpoint {
@@ -59,8 +60,12 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
         }
 
         if(map.containsKey("id") && map.containsKey("value")) {
-            if(apiKeyService.getAPIKeyId(map.get("id"))) {
-                sensorService.createSensorDataEntity(map.get("id"), map.get("value"));
+            if(apiKeyService.findAPIKeyId(map.get("id"))) {
+                //sensorService.createSensorDataEntity(map.get("id"), map.get("value"));
+                if (sensorService.find(map.get("id")) == null) {
+                    sensorService.createSensor(map.get("id"));
+                }
+                sensorService.addSensorData(map.get("id"), map.get("value"));
                 return MessageBuilder.withPayload("ok")
                         .copyHeadersIfAbsent(msg.getHeaders())
                         .setHeader(STATUSCODE_HEADER, HttpStatus.OK)
