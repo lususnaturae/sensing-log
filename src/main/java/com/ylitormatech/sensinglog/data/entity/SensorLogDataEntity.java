@@ -1,7 +1,6 @@
 package com.ylitormatech.sensinglog.data.entity;
 
-import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.GenerationTime;
+import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 import javax.persistence.Entity;
@@ -9,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Created by mika on 9.6.2016.
@@ -18,15 +18,16 @@ import javax.validation.constraints.NotNull;
 public class SensorLogDataEntity {
     @Id
     @GeneratedValue
-    Long id;
+    private Long id;
 
     @NotNull
-    Integer sensorid;
+    private Integer sensorid;
 
-    @Generated(GenerationTime.INSERT)
-    DateTime created;
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime created;
 
-    String data;
+    @Size(max=500)
+    private String data;
 
     public Long getId() {
         return id;
