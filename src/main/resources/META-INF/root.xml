@@ -109,7 +109,7 @@
     <!-- Activemq connection factory -->
     <bean id="amqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <!-- brokerURL, You may have different IP or port -->
-        <constructor-arg index="0" value="tcp://127.0.0.1:61616" />
+        <constructor-arg index="0" value="${activemq.tcp}" />
     </bean>
 
     <!-- Pooled Spring connection factory -->
@@ -122,7 +122,7 @@
     <!--  lets create an embedded ActiveMQ Broker -->
     <amq:broker useJmx="false" persistent="false">
         <amq:transportConnectors>
-            <amq:transportConnector uri="tcp://127.0.0.1:61616" />
+            <amq:transportConnector uri="${activemq.tcp}" />
         </amq:transportConnectors>
     </amq:broker>
 
