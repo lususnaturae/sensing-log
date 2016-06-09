@@ -19,7 +19,6 @@ public class MessagingSensorEPImpl implements MessagingSensorEP {
 
     public String receive(String message) {
 
-
         // Just for testing: This must be implemented as queue (or such) and
         // let a thread take care of the database writing. Make sure this
         // call returns as fast as possible!

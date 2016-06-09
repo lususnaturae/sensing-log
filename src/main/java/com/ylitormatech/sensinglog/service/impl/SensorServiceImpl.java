@@ -5,6 +5,7 @@ import com.ylitormatech.sensinglog.data.entity.SensorLogEntity;
 import com.ylitormatech.sensinglog.data.repository.SensorDataRepository;
 import com.ylitormatech.sensinglog.data.repository.SensorRepository;
 import com.ylitormatech.sensinglog.service.SensorService;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +58,7 @@ public class SensorServiceImpl implements SensorService {
             SensorLogDataEntity sensData = new SensorLogDataEntity();
             sensData.setSensorid(sensor.getId());
             sensData.setData(data);
-            //sensData.setCreated(DateTime.now());
+            sensData.setCreated(DateTime.now());
 
             sensorDataRepository.add(sensData);
         }
