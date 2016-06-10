@@ -164,4 +164,10 @@
     <int:publish-subscribe-channel  id="inQueue_sens"  />
     <int:service-activator input-channel="inQueue_sens" send-timeout="1000" requires-reply="true" ref="messagingSensorEP" method="receive"/>
 
+    <!-- Spring PostProcessor annotation bean -->
+    <context:annotation-config></context:annotation-config>
+    <bean id="messagingSensorEP" class="com.ylitormatech.sensinglog.endpoint.impl.MessagingSensorEPImpl">
+        <!--<property name="message" value="i'm property message" /> -->
+    </bean>
+
 </beans>
