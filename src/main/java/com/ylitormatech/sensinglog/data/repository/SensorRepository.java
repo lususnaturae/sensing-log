@@ -1,6 +1,7 @@
 package com.ylitormatech.sensinglog.data.repository;
 
 import com.ylitormatech.sensinglog.data.entity.SensorEntity;
+import com.ylitormatech.sensinglog.data.entity.SensorMessage;
 
 /**
  * Created by Perttu Vanharanta on 1.6.2016.
@@ -8,4 +9,6 @@ import com.ylitormatech.sensinglog.data.entity.SensorEntity;
 public interface SensorRepository {
 
     public void add(SensorEntity sensorEntity);
+
+    public void addMessage(SensorMessage message);
 }

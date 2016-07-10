@@ -1,47 +1,54 @@
 package com.ylitormatech.sensinglog.data.entity;
 
-import org.hibernate.annotations.Type;
-import org.joda.time.DateTime;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Created by Perttu Vanharanta on 1.6.2016.
  */
-@Table
+
+
+// OBSOLETE: ApiKeyEntity sisältää jo kaiken tarvittavan!!!!
+
+
+@Table //(name="SENSOR")
 @Entity
 public class SensorEntity {
-    @Id
-    @GeneratedValue
-    Integer id;
+
+    private Long dataid;
+    //private ApiKeyEntity apikey;
 
     String APIKey;
 
+    private Integer apiKeyId;
+
     Double value;
 
-    public Integer getId() {
-        return id;
+    @Id
+    @GeneratedValue(generator="myGenerator")
+    @GenericGenerator(name="myGenerator", strategy="foreign", parameters= @Parameter(value="apikey", name = "property"))
+    public Long getId() {
+        return dataid;
+    }
+    public void setId(Long dataid) {
+        this.dataid = dataid;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
     public String getAPIKey() {
         return APIKey;
     }
-
     public void setAPIKey(String APIKey) {
         this.APIKey = APIKey;
     }
 
+
     public Double getValue() {
         return value;
     }
-
     public void setValue(Double value) {
         this.value = value;
     }
+
 }

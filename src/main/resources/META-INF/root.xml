@@ -7,6 +7,7 @@
        xmlns:int-http="http://www.springframework.org/schema/integration/http"
        xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
        xmlns:amq="http://activemq.apache.org/schema/core"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
        xsi:schemaLocation="
                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
@@ -16,7 +17,7 @@
 	           http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
                http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-4.2.xsd
                http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd
-
+               http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.8.xsd
         ">
 
 
@@ -62,12 +63,29 @@
     </bean>
 
     <tx:annotation-driven transaction-manager="transactionManager" />
-
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="myEmf" />
     </bean>
 
+    <!-- Mongodb configuration -->
+    <!--<mongo:mongo id="mongo" host="127.0.0.1" port="27017" />
+    <mongo:db-factory dbname="SensingLogSensorData" /> -->
 
+    <bean id="mongo" class="org.springframework.data.mongodb.core.MongoClientFactoryBean">
+        <property name="host" value="localhost" />
+        <property name="port" value="27017" />
+    </bean>
+
+    <bean id="mongoDbFactory" class="org.springframework.data.mongodb.core.SimpleMongoDbFactory">
+        <constructor-arg name="mongo" ref="mongo" />
+        <constructor-arg name="databaseName" value="SensinglogSensorData" />
+    </bean>
+
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+    </bean>
+    <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+    <mongo:repositories base-package="org.springframework.data.mongodb.repository" mongo-template-ref="mongoTemplate" />
 
 
     <int:annotation-config/>

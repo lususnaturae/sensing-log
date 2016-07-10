@@ -73,6 +73,14 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
         /*
         *  Here comes data handling
         */
+
+        // message is json-formatted.
+        // TODO: separate token from message and check validity
+        // TODO: fetch individual data items from message and save to MongoDB as object
+
+        sensorService.saveMessage(message);
+
+
         return "OK";
     }
 
