@@ -3,6 +3,7 @@ package com.ylitormatech.sensinglog.endpoint.impl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.ylitormatech.sensinglog.data.component.SaverThread;
 import com.ylitormatech.sensinglog.endpoint.MessagingEndpoint;
 import com.ylitormatech.sensinglog.service.ApiKeyService;
 import com.ylitormatech.sensinglog.service.SensorService;
@@ -13,10 +14,13 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
-
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by Perttu Vanharanta on 1.6.2016.
@@ -34,6 +38,29 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
     @Autowired
     ApiKeyService apiKeyService;
 
+    // ========================================================================================
+    private final int workerPoolSize = 3;
+    private ExecutorService saveWorkers = null;
+
+    // See root.xml for the PostConstruct bean.
+    // This is run after any constructors and sertters, but before anything else.
+    @PostConstruct
+    public void initSensorThreads() throws Exception {
+        System.out.println("CREATING MessagingEndpointImpl: setting up thread pool...");
+        saveWorkers = Executors.newFixedThreadPool(workerPoolSize);
+        System.out.println("CREATING MessagingEndpointImpl: Done!");
+    }
+
+    // This is run just before the class is destroyed.
+    // NOTICE: The application must be close by Exit !!!, not by Stop !!!!
+    @PreDestroy
+    public void cleanSensorThreads() throws Exception {
+        System.out.println("DESTROY MessagingEndpointImpl: running down thread pool...");
+        saveWorkers.shutdown();
+        while (!saveWorkers.isTerminated()) { }
+        System.out.println("DESTROY MessagingEndpointImpl: Done!");
+    }
+    // ========================================================================================
 
     public String newApiKey(String message) {
         String className = "newApiKey";
@@ -78,7 +105,13 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
         // TODO: separate token from message and check validity
         // TODO: fetch individual data items from message and save to MongoDB as object
 
-        sensorService.saveMessage(message);
+        // TODO: Change message saving so that each data type in the message is saved in
+        //      separate row in Mongo database.
+
+        //sensorService.saveMessage(message);
+
+        Runnable saver = new SaverThread(sensorService, message);
+        saveWorkers.execute(saver);
 
 
         return "OK";
