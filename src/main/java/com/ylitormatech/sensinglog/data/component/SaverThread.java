@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.ylitormatech.sensinglog.service.SensorService;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+//import com.sun.org.apache.xml.internal.resolver.helpers.Debug;
 
 /**
  * Created by mika on 10.6.2016.
@@ -24,6 +27,9 @@ public class SaverThread implements Runnable {
     private String message;
     private SensorService sensorService;
 
+    Logger logger = Logger.getLogger(this.getClass().getName());
+    public static final boolean DEV_MODE = true;
+
     public SaverThread(SensorService sensServ, String msg) {
         this.sensorService = sensServ;
         this.message = msg;
@@ -32,9 +38,17 @@ public class SaverThread implements Runnable {
 
     @Override
     public void run() {
-        //System.out.println(Thread.currentThread().getName() + " Start: Message = " + message);
+        long lStartTime, lEndTime = 0;
+        if (DEV_MODE) {
+            lStartTime = System.currentTimeMillis();
+        }
+        logger.debug("run(): STARTED");
         processSave();
-        //System.out.println(Thread.currentThread().getName() + " End");
+
+        if (DEV_MODE) {
+            lEndTime = System.currentTimeMillis();
+        }
+        logger.debug("run(): ENDED: Elapsed millisecs: " + (lEndTime - lStartTime));
     }
 
 
@@ -49,7 +63,7 @@ public class SaverThread implements Runnable {
     */
     private void processSave() {
         if ( sensorService == null || message.isEmpty() ) {
-            System.out.println("processSave: Invalid SensorService or empty message detected!");
+            logger.error("processSave(): Invalid SensorService or empty message detected!");
             return;
         }
 
@@ -81,27 +95,30 @@ public class SaverThread implements Runnable {
                         iStartObject++;
                         if ( iStartObject == 1 ) {  // At the beginning of the static part...
                             currNewMsg = strBaseJson;
-                            strBaseJson.append("{");
+                            currNewMsg.append("{");
                         }
                         else if (iStartObject == 2) {
                             // This bracket is removed from the string, since data-level is removed
-                            // from the new jsons.
+                            // from the new jsons. However, this is the end of the base json string:
+                            // start always a new json to store the data part individually (base + data).
+                            currNewMsg = new StringBuilder(strBaseJson.toString());
+                            newMsgs.add(currNewMsg);             // Add to collection for saving...
                         }
                         else {
-                            // End of the base json string: start always a new json to store the data part (base + data).
-                            currNewMsg = new StringBuilder(strBaseJson.toString());
+                            // We arrive here only if there are multiple 'value' items. In that case
+                            // just enclose them with '{}'.
                             currNewMsg.append("{");
-
-                            newMsgs.add(currNewMsg);             // Add to collection for saving...
                             fComma = false;
                         }
                         currFieldName.setLength(0);
                         break;
                     case FIELD_NAME:    // This is field name, always string.
+                        currFieldName.setLength(0);
                         currFieldName.append(jsonOldParser.getCurrentName());
                         if ("data".equals(currFieldName.toString())) {
-                            currFieldName.setLength(0);
                             // DO NOT write "data" into the new json at all!
+                            currFieldName.setLength(0);
+                            break;
                         }
                         else {
                             if (fComma) {
@@ -115,7 +132,6 @@ public class SaverThread implements Runnable {
                         break;
                     case VALUE_STRING:  // String value for the last field name.
                         currNewMsg.append("\"" + jsonOldParser.getValueAsString() + "\"");
-                        currFieldName.setLength(0);
                         break;
                     case VALUE_NUMBER_INT:  // Integer formatted value for the last field name.
                         if ("timestamp".equals(currFieldName.toString())) {
@@ -124,11 +140,13 @@ public class SaverThread implements Runnable {
                         else {
                             currNewMsg.append( jsonOldParser.getValueAsInt());
                         }
-                        currFieldName.setLength(0);
                         break;
-                    case VALUE_NUMBER_FLOAT:
+                    case VALUE_NUMBER_FLOAT:    // Float formatted value for the last field name.
                         currNewMsg.append( jsonOldParser.getValueAsDouble());
-                        currFieldName.setLength(0);
+                        break;
+                    case VALUE_FALSE:
+                    case VALUE_TRUE:
+                        currNewMsg.append( jsonOldParser.getValueAsBoolean() );
                         break;
                     case START_ARRAY:
                         // Just ignore this: We must combine each
@@ -150,7 +168,7 @@ public class SaverThread implements Runnable {
                             }
                         }
                         else if (iStartObject == 2) {
-                            // This was removed from the new json!!!
+                            // This is skipped for the new json!!!
                         }
                         else {
                             currNewMsg.append("}");
@@ -170,7 +188,10 @@ public class SaverThread implements Runnable {
             }
         }
         catch (IOException ioe) {
-            System.out.println("processSave: " + ioe.getMessage());
+            logger.error("processSave(): " + ioe.getMessage());
+        }
+        catch (NullPointerException npe) {
+            logger.error("processSave(): " + npe.getMessage());
         }
     }
 }

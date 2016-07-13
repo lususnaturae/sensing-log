@@ -95,8 +95,7 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
 
 
     public String receiveData(String message) {
-        String className = "receiveData";
-        logger.debug(className + " datamessage: "+ message);
+        logger.debug("receiveData(): datamessage: " + message);
         /*
         *  Here comes data handling
         */
