@@ -2,6 +2,7 @@ package com.ylitormatech.sensinglog.data.repository.impl;
 
 import com.ylitormatech.sensinglog.data.entity.ApiKeyEntity;
 import com.ylitormatech.sensinglog.data.repository.ApiKeyRepository;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -14,6 +15,8 @@ import java.util.List;
  */
 @Repository
 public class ApiKeyRepositoryImpl implements ApiKeyRepository{
+
+    Logger logger = Logger.getLogger(this.getClass().getName());
 
     @PersistenceContext
     EntityManager em;
@@ -46,4 +49,41 @@ public class ApiKeyRepositoryImpl implements ApiKeyRepository{
         return false;
     }
 
+    @Override
+    public Integer findSensorIdByApiKey(String apikey) {
+        ApiKeyEntity ake = null;
+        int id = 0;
+
+        try {
+            ake = em.createQuery("FROM ApiKeyEntity a WHERE a.apikey=:apikey", ApiKeyEntity.class)
+                    .setParameter("apikey", apikey)
+                    .getSingleResult();
+            if (ake != null) {
+                id = ake.getSensorId();
+            }
+        }
+        catch (Exception e) {
+            logger.error("ApiKey-table query exception: " + e.getMessage());
+        }
+        return id;
+    }
+
+    @Override
+    public Integer checkSensorValidity(String apikey) {
+        ApiKeyEntity ake = null;
+        int id = 0;
+
+        try {
+            ake = em.createQuery("FROM ApiKeyEntity a WHERE a.apikey=:apikey", ApiKeyEntity.class)
+                    .setParameter("apikey", apikey)
+                    .getSingleResult();
+            if (ake != null && ake.isActivated()) {
+                id = ake.getSensorId();
+            }
+        }
+        catch (Exception e) {
+            logger.error("ApiKey-table query exception: " + e.getMessage());
+        }
+        return id;
+    }
 }

@@ -13,7 +13,7 @@ import javax.persistence.*;
 // OBSOLETE: ApiKeyEntity sisältää jo kaiken tarvittavan!!!!
 
 
-@Table //(name="SENSOR")
+@Table (name="SENSOR")
 @Entity
 public class SensorEntity {
 

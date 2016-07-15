@@ -12,4 +12,7 @@ public interface ApiKeyRepository {
     public void update(ApiKeyEntity apiKeyEntity);
     public ApiKeyEntity findEntity(String apikey);
     public boolean find(String apikey);
+
+    public Integer findSensorIdByApiKey(String key);
+    public Integer checkSensorValidity(String apikey);
 }

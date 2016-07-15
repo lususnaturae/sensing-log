@@ -63,6 +63,21 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
     // ========================================================================================
 
     public String newApiKey(String message) {
+        /*
+        String message: Json-formatted string containing necessary sensor data to
+        store incoming data from the sensor, and handle the data reading requests
+        from user. The content of the message is:
+        - ApiKey:   Currently used apikey (sensor sending id).
+        - SensorId: Sensor database id.
+        - Sensor data types: List of data types sensor (is allowed) to send.
+
+        Notes:
+        - ApiKey can be changed. It only identifies the sensor during the
+        sending operation and is valid until reset. The ApiKey sensor id
+        will be replaces with the SensorId when data is saved in database.
+        - SensorId is the permanent unique id given for the sensor by the system.
+        It is not visible to outside the core application.
+         */
         String className = "newApiKey";
         logger.debug(className + " key: "+ message);
 
@@ -109,9 +124,8 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
 
         //sensorService.saveMessage(message);
 
-        Runnable saver = new SaverThread(sensorService, message);
+        Runnable saver = new SaverThread(apiKeyService, sensorService, message);
         saveWorkers.execute(saver);
-
 
         return "OK";
     }
@@ -139,7 +153,7 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
 
         if(map.containsKey("id") && map.containsKey("value")) {
             logger.debug(className + " id and value exist");
-            if(apiKeyService.getAPIKeyId(map.get("id"))) {
+            if(apiKeyService.testAPIKey(map.get("id"))) {
                 logger.debug(className + " ApiKey found");
                 sensorService.createSensorDataEntity(map.get("id"), map.get("value"));
                 return MessageBuilder.withPayload("ok")
