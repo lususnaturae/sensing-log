@@ -46,7 +46,6 @@ public class ApiKeyEntity {
     public Integer getApikeyId() {
         return apikeyId;
     }
-
     public void setApikeyId(Integer apikeyId) {
         this.apikeyId = apikeyId;
     }
@@ -54,7 +53,6 @@ public class ApiKeyEntity {
     public String getApikey() {
         return apikey;
     }
-
     public void setApikey(String apikey) {
         this.apikey = apikey;
     }
@@ -62,7 +60,6 @@ public class ApiKeyEntity {
     public Integer getSensorId() {
         return sensorId;
     }
-
     public void setSensorId(Integer sensorId) {
         this.sensorId = sensorId;
     }
@@ -70,15 +67,14 @@ public class ApiKeyEntity {
     public Set<SensorDataTypeEntity> getDatatypes() {
         return datatypes;
     }
-
     public void setDatatypes(Set<SensorDataTypeEntity> datatypes) {
         this.datatypes = datatypes;
     }
+    public void addDataType(SensorDataTypeEntity datatype) { this.datatypes.add(datatype); }
 
     public boolean isActivated() {
         return isActivated;
     }
-
     public void setActivated(boolean activated) {
         isActivated = activated;
     }

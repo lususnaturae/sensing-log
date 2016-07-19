@@ -112,18 +112,8 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
     public String receiveData(String message) {
         logger.debug("receiveData(): datamessage: " + message);
         /*
-        *  Here comes data handling
+        *  Message from sensor: Save it to Mongo db.
         */
-
-        // message is json-formatted.
-        // TODO: separate token from message and check validity
-        // TODO: fetch individual data items from message and save to MongoDB as object
-
-        // TODO: Change message saving so that each data type in the message is saved in
-        //      separate row in Mongo database.
-
-        //sensorService.saveMessage(message);
-
         Runnable saver = new SaverThread(apiKeyService, sensorService, message);
         saveWorkers.execute(saver);
 
@@ -155,7 +145,14 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
             logger.debug(className + " id and value exist");
             if(apiKeyService.testAPIKey(map.get("id"))) {
                 logger.debug(className + " ApiKey found");
-                sensorService.createSensorDataEntity(map.get("id"), map.get("value"));
+
+                //sensorService.createSensorDataEntity(map.get("id"), map.get("value"));
+                // message here should contain the apikey in it. Now they are
+                // separated: What is the content of value?
+                // TODO
+                Runnable saver = new SaverThread(apiKeyService, sensorService, map.get("value"));
+                saveWorkers.execute(saver);
+
                 return MessageBuilder.withPayload("ok")
                         .copyHeadersIfAbsent(msg.getHeaders())
                         .setHeader(STATUSCODE_HEADER, HttpStatus.OK)

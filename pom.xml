@@ -219,7 +219,7 @@
         <configuration>
           <path>/</path>
           <port>9888</port>
-          <ajpPort>8019</ajpPort>
+          <ajpPort>8021</ajpPort>
         </configuration>
       </plugin>
       <plugin>

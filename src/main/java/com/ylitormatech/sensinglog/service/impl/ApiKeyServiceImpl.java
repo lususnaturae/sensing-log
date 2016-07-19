@@ -1,13 +1,13 @@
 package com.ylitormatech.sensinglog.service.impl;
 
+import com.ylitormatech.sensinglog.data.component.ApiKeyMessageParser;
 import com.ylitormatech.sensinglog.data.entity.ApiKeyEntity;
+import com.ylitormatech.sensinglog.data.entity.SensorDataTypeEntity;
 import com.ylitormatech.sensinglog.data.repository.ApiKeyRepository;
 import com.ylitormatech.sensinglog.service.ApiKeyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * Created by Perttu Vanharanta on 1.6.2016.
@@ -21,41 +21,35 @@ public class ApiKeyServiceImpl implements ApiKeyService{
     @Transactional(readOnly = false)
     public void createApiKey(String message) {
         ApiKeyEntity apiKeyEntity = new ApiKeyEntity();
+        SensorDataTypeEntity dataTypes = new SensorDataTypeEntity();
 
         // First parse out the message from json:
+        ApiKeyMessageParser msgParsed = new ApiKeyMessageParser(message);
+        if (msgParsed.breakMessage()) {
+            apiKeyEntity.setApikey(msgParsed.getApiKey());
+            apiKeyEntity.setSensorId(msgParsed.getSensorId());
+            for(String dType : msgParsed.getDataTypes()) {
+                apiKeyEntity.addDataType(new SensorDataTypeEntity(dType));
+            }
+            apiKeyEntity.setActivated(true);
 
-
-
-        //apiKeyEntity.setApikey(key);
-        apiKeyEntity.setActivated(true);
-
-
-
-
-
-
-
-
-
-        apiKeyRepository.add(apiKeyEntity);
-    }
-
-    @Override
-    public List<String> getApiKeys() {
-        return null;
-    }
-
-    @Transactional(readOnly = false)
-    public void updateApiKey(String key, boolean isActivated){
-        ApiKeyEntity apiKeyEntity = apiKeyRepository.findEntity(key);
-        apiKeyEntity.setActivated(isActivated);
-        apiKeyRepository.update(apiKeyEntity);
+            apiKeyRepository.add(apiKeyEntity);
+        }
     }
 
     @Transactional(readOnly = false)
     public void removeApiKey(String key){
         apiKeyRepository.remove(key);
     }
+
+    @Transactional(readOnly = false)
+    public void updateApiKey(String key, boolean isActivated){
+
+        ApiKeyEntity apiKeyEntity = apiKeyRepository.findEntity(key);
+        apiKeyEntity.setActivated(isActivated);
+        apiKeyRepository.update(apiKeyEntity);
+    }
+
 
     @Transactional(readOnly = true)
     public boolean testAPIKey(String key) {

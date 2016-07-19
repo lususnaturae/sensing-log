@@ -5,7 +5,7 @@ package com.ylitormatech.sensinglog.service;
  */
 public interface SensorService {
 
-    public void createSensorDataEntity(String id,String value);
+    //public void createSensorDataEntity(String id,String value);
 
     public void saveMessage(String message);
 }
