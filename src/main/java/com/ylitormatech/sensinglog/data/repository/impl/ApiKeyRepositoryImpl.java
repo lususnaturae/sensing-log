@@ -25,10 +25,22 @@ public class ApiKeyRepositoryImpl implements ApiKeyRepository{
         em.persist(apiKeyEntity);
     }
 
-    public void remove(String key){
-        ApiKeyEntity apiKeyEntity;
-        apiKeyEntity = findEntity(key);
-        em.remove(apiKeyEntity);
+    public ApiKeyEntity remove(Integer sensorId){
+        ApiKeyEntity apiKeyEntity = null;
+
+        String hql = "FROM ApiKeyEntity a WHERE a.sensorId = :sensorId";
+        Query query = em.createQuery(hql);
+        query.setParameter("sensorId", sensorId);
+
+        try {
+            apiKeyEntity = (ApiKeyEntity) query.getSingleResult();
+        }
+        catch (Exception e) {
+            logger.debug("ApiKeyRepositoryImpl: Cannot remove sensor with sensorId: " + sensorId);
+        }
+        return apiKeyEntity;
+
+        //em.remove(apiKeyEntity);
     }
 
     public void update(ApiKeyEntity apiKeyEntity) {em.merge(apiKeyEntity);}

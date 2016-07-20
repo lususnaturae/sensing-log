@@ -89,8 +89,16 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
         String className = "removeApiKey";
         logger.debug(className + " key: "+ message);
 
-        apiKeyService.removeApiKey(message);
-        return "OK";
+        /*
+        String message: Json-formatted string containing 'sensorId' of the sensor.
+        String is json-formatted integer.
+         */
+
+        if (apiKeyService.removeApiKey(message) ) {
+            // The above call also removes all messages for the sensor!
+            return "OK";
+        }
+        return "FALSE";
     }
 
     public String activateApiKey(String message) {

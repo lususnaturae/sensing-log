@@ -8,4 +8,6 @@ public interface SensorService {
     //public void createSensorDataEntity(String id,String value);
 
     public void saveMessage(String message);
+
+    public Integer removeMessages(Integer sensorId, Long start, Long end);
 }

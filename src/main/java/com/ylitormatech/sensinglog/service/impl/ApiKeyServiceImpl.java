@@ -5,6 +5,7 @@ import com.ylitormatech.sensinglog.data.entity.ApiKeyEntity;
 import com.ylitormatech.sensinglog.data.entity.SensorDataTypeEntity;
 import com.ylitormatech.sensinglog.data.repository.ApiKeyRepository;
 import com.ylitormatech.sensinglog.service.ApiKeyService;
+import com.ylitormatech.sensinglog.service.SensorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,9 @@ public class ApiKeyServiceImpl implements ApiKeyService{
 
     @Autowired
     ApiKeyRepository apiKeyRepository;
+
+    @Autowired
+    SensorService sensorService;
 
     @Transactional(readOnly = false)
     public void createApiKey(String message) {
@@ -38,8 +42,20 @@ public class ApiKeyServiceImpl implements ApiKeyService{
     }
 
     @Transactional(readOnly = false)
-    public void removeApiKey(String key){
-        apiKeyRepository.remove(key);
+    public Boolean removeApiKey(String message){
+
+        // First parse out the message from json:
+        ApiKeyMessageParser msgParsed = new ApiKeyMessageParser(message);
+        if (msgParsed.breakMessage()) {
+            ApiKeyEntity ake = apiKeyRepository.remove(msgParsed.getSensorId());
+            if (ake != null) {
+                // Remove also all sensor data:
+                int iRemoved = sensorService.removeMessages(msgParsed.getSensorId(), 0L, 0L);
+                // logger here: iRemoved documents removed from mongodb: can be zero.
+                return true;
+            }
+        }
+        return false;
     }
 
     @Transactional(readOnly = false)
@@ -52,12 +68,12 @@ public class ApiKeyServiceImpl implements ApiKeyService{
 
 
     @Transactional(readOnly = true)
-    public boolean testAPIKey(String key) {
+    public Boolean testAPIKey(String key) {
         return false;
     }
 
     @Transactional(readOnly = true)
-    public boolean getAPIKeyId(String key){
+    public Boolean getAPIKeyId(String key){
         return apiKeyRepository.find(key);
     }
 

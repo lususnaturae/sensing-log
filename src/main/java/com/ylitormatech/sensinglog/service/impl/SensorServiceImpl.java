@@ -34,4 +34,19 @@ public class SensorServiceImpl implements SensorService {
         SensorMessage sensorMessage = new SensorMessage(message);
         sensorRepository.addMessage(sensorMessage);
     }
+
+    @Transactional(readOnly = false)
+    public Integer removeMessages(Integer sensorId, Long start, Long end) {
+        // Remove all messages for specified sensor, and/or at the given time(stamp) range.
+        // If start == 0, remove all up to 'end' time.
+        // If end == 0, remove all from 'start' time onward.
+        // If start == end == 0, remove all.
+        // Method return number of removed documents, or zero if nono is removed.
+
+        if (sensorId <= 0 || (start > end && end != 0) ) {
+            return sensorRepository.removeMessages(sensorId, start, end);
+        }
+
+        return 0;
+    }
 }

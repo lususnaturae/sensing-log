@@ -1,6 +1,5 @@
 package com.ylitormatech.sensinglog.data.repository;
 
-import com.ylitormatech.sensinglog.data.entity.SensorEntity;
 import com.ylitormatech.sensinglog.data.entity.SensorMessage;
 
 /**
@@ -8,7 +7,9 @@ import com.ylitormatech.sensinglog.data.entity.SensorMessage;
  */
 public interface SensorRepository {
 
-    public void add(SensorEntity sensorEntity);
+    //public void add(SensorEntity sensorEntity);
 
     public void addMessage(SensorMessage message);
+
+    public Integer removeMessages(Integer sensorId, Long start, Long end);
 }
