@@ -49,12 +49,8 @@ public class ApiKeyMessageParser {
 
     /*
     E.g.:
-    {"apikey":"adsfdsafdsf",
-     "sensorid":2,
-     "datatypes":[{"datatype":"ACC"},{"datatype":"HUM"}]}
-    --->
-    {"apikey":"adsfdsafdsf","timestamp":1234567890,"datatype":"ACC","value":{"x":0.4,"y":0.3,"z":0.3}}
-    {"apikey":"adsfdsafdsf","timestamp":1234567890,"datatype":"HUM","value":20}
+    {"apikey":"04FC9A2B1F80222E534998EC1F028B251CA613D80B24781A27055A0923C1C783",
+     "id":7,"datatype":[{"id":1,"name":"TMP","labeltoken":"sensor.type.checkbox.label.tmp"},{<possible next dt>}]}
     */
     private boolean processMessage() {
         boolean fRet = false;
@@ -70,12 +66,13 @@ public class ApiKeyMessageParser {
         try {
             // Load the original message to parser:
             jsonOldParser = jsonOldFactory.createParser(origMessage);
-            int iStartObject = 0;    // Start token counter.
-            boolean fComma = false;
+            int iStartObject = 0;   // Start token counter.
+            int iArrayObject = 0;   // Array token counter.
             StringBuilder valueString = new StringBuilder();
             StringBuilder currFieldName = new StringBuilder();
-            boolean fCheckValidity = false;
             boolean fNotValid = false;
+            boolean fDatatypeValid = false;    // if 'true', id refers to datatype (at the following loops).
+            int iDatatypeAO = 0;                // Helper for fDatatypeValid controlling.
 
             // This will give all jsonTokens one at a time, like:
             // START_OBJECT,FIELD_NAME,VALUE_STRING,...,START_OBJECT,...,END_OBJECT,END_OBJECT.
@@ -100,15 +97,19 @@ public class ApiKeyMessageParser {
                             this.apiKey.append(jsonOldParser.getValueAsString());
                             fRet = true;
                         }
-                        if ("datatype".equals(currFieldName.toString())) {
-                            // TODO: check datatype validity...
-                            dataTypes.add(jsonOldParser.getValueAsString());
+                        if ("name".equals(currFieldName.toString())) {
+                            if (fDatatypeValid) {
+                                // TODO: validity check for datatype ???
+                                dataTypes.add(jsonOldParser.getValueAsString());
+                            }
                             fRet = true;
                         }
                         break;
                     case VALUE_NUMBER_INT:  // Integer formatted value for the last field name.
-                        if ("sensorid".equals(currFieldName.toString())) {
-                            this.sensorId = jsonOldParser.getValueAsInt();
+                        if ("id".equals(currFieldName.toString())) {
+                            if (!fDatatypeValid) {
+                                this.sensorId = jsonOldParser.getValueAsInt();
+                            }
                             fRet = true;
                         }
                         break;
@@ -118,9 +119,18 @@ public class ApiKeyMessageParser {
                     case VALUE_TRUE:
                         break;
                     case START_ARRAY:
+                        iArrayObject++;
+                        if ("datatype".equals(currFieldName.toString())) {
+                            fDatatypeValid = true;
+                            iDatatypeAO = iArrayObject;
+                        }
                         break;
                     case END_ARRAY:
-                        // Ignored, see above.
+                        if (iDatatypeAO == iArrayObject) {
+                            fDatatypeValid = false;
+                            iDatatypeAO = 0;
+                        }
+                        iArrayObject--;
                         break;
                     case END_OBJECT:
                         iStartObject--;

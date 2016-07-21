@@ -68,8 +68,8 @@ public class SaverThread implements Runnable {
      "timestamp":1234567890,
      "data":[{"datatype":"ACC","value":{"x": 0.4,"y":0.3,"z":0.3}},{"datatype":"HUM","value":20}]}
     --->
-    {"apikey":"adsfdsafdsf","timestamp":1234567890,"datatype":"ACC","value":{"x":0.4,"y":0.3,"z":0.3}}
-    {"apikey":"adsfdsafdsf","timestamp":1234567890,"datatype":"HUM","value":20}
+    {"sensorid":2,"timestamp":1234567890,"datatype":"ACC","value":{"x":0.4,"y":0.3,"z":0.3}}
+    {"sensorid":2,"timestamp":1234567890,"datatype":"HUM","value":20}
     */
     private void processSave() {
         if ( sensorService == null || message.isEmpty() ) {
@@ -238,7 +238,7 @@ public class SaverThread implements Runnable {
         boolean fRet = false;
 
         // Test sensor validity: apikey existence, active status.
-        // Returns the databse id of the sensor, if found. Otherwise zero value.
+        // Returns true if the sensor is valid (by apikey) and set the databse id of the sensor as apikey field value.
 
         if (apikey.length() > 0) {
             int id = apiKeyService.checkSensorValidityByApiKey(apikey.toString());

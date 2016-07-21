@@ -34,13 +34,16 @@ public class ApiKeyRepositoryImpl implements ApiKeyRepository{
 
         try {
             apiKeyEntity = (ApiKeyEntity) query.getSingleResult();
+
+            if (apiKeyEntity != null) {
+                em.remove(apiKeyEntity);
+            }
         }
         catch (Exception e) {
             logger.debug("ApiKeyRepositoryImpl: Cannot remove sensor with sensorId: " + sensorId);
         }
-        return apiKeyEntity;
 
-        //em.remove(apiKeyEntity);
+        return apiKeyEntity;    // Must return apikey to enable the data removal also!
     }
 
     public void update(ApiKeyEntity apiKeyEntity) {em.merge(apiKeyEntity);}
@@ -89,7 +92,7 @@ public class ApiKeyRepositoryImpl implements ApiKeyRepository{
             ake = em.createQuery("FROM ApiKeyEntity a WHERE a.apikey=:apikey", ApiKeyEntity.class)
                     .setParameter("apikey", apikey)
                     .getSingleResult();
-            if (ake != null && ake.isActivated()) {
+            if (ake != null && ake.isActive()) {
                 id = ake.getSensorId();
             }
         }

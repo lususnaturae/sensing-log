@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * Created by Perttu Vanharanta on 1.6.2016.
  */
-@Table (name="sensor")
+@Table (name="APIKEY")
 @Entity
 public class ApiKeyEntity {
 
@@ -16,31 +16,32 @@ public class ApiKeyEntity {
     @Column(name="APIKEY_ID", unique = true, nullable = false)
     private Integer apikeyId;
 
-    @Column(name="APIKEY", unique = true, nullable = false, length = 100)
-    private String apikey;
-
     @Column(name="SENSOR_ID", unique = true, nullable = false)
     private Integer sensorId;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "sensordata_map", catalog="sensorlog", joinColumns = {
-        @JoinColumn(name = "APIKEY_ID", nullable = false, updatable = false)},
-        inverseJoinColumns = { @JoinColumn(name="DATATYPE_ID", nullable = false,
-        updatable = false) })
+    @Column(name="APIKEY", length = 100)
+    private String apikey;
+
+    @Column(name="ACTIVATED", nullable = false)
+    private boolean active;
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name="APIKEY_DATATYPE",
+               joinColumns = @JoinColumn(name="APIKEY_ID", referencedColumnName = "APIKEY_ID"),
+               inverseJoinColumns = @JoinColumn(name="DATATYPE_ID", referencedColumnName = "DATATYPE_ID"))
     private Set<SensorDataTypeEntity> datatypes;
 
-    private boolean isActivated;
 
     public ApiKeyEntity() {
-        datatypes = new HashSet<SensorDataTypeEntity>(0);
-        isActivated = false;
+        datatypes = new HashSet<SensorDataTypeEntity>();
+        active = false;
     }
 
     public ApiKeyEntity(String apikey, Integer sensorId ) {
         this.apikey = apikey;
         this.sensorId = sensorId;
-        datatypes = new HashSet<SensorDataTypeEntity>(0);
-        isActivated = false;
+        datatypes = new HashSet<SensorDataTypeEntity>();
+        active = false;
     }
 
     public Integer getApikeyId() {
@@ -72,21 +73,11 @@ public class ApiKeyEntity {
     }
     public void addDataType(SensorDataTypeEntity datatype) { this.datatypes.add(datatype); }
 
-    public boolean isActivated() {
-        return isActivated;
+    public boolean isActive() {
+        return active;
     }
-    public void setActivated(boolean activated) {
-        isActivated = activated;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
-    /*public boolean isType(String dtype) {
-        boolean fRet = false;
-        for ( String type : datatypes ) {
-            if (dtype.equals(type)) {
-                fRet = true;
-                break;
-            }
-        }
-        return fRet;
-    }*/
 }

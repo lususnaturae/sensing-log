@@ -1,5 +1,7 @@
 package com.ylitormatech.sensinglog.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,17 +19,21 @@ public class SensorDataTypeEntity {
     @Column(name = "DATATYPE_ID", unique = true, nullable = false)
     private Integer dataTypeId;
 
-    @Column(name = "DATATYPE", nullable = false, length = 10)
+    @Column(name = "DATATYPE", nullable = false, length = 40)
     private String dataType;
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "datatypes")
-    private Set<ApiKeyEntity> apiKeyEntities = new HashSet<ApiKeyEntity>(0);
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<ApiKeyEntity> apiKeyEntities;
+
 
     public SensorDataTypeEntity() {
+        this.apiKeyEntities = new HashSet<ApiKeyEntity>();
 
     }
     public SensorDataTypeEntity(String dataType) {
         this.dataType = dataType;
+        this.apiKeyEntities = new HashSet<ApiKeyEntity>();
     }
 
     public Integer getDataTypeId() {
@@ -50,4 +56,5 @@ public class SensorDataTypeEntity {
     public void setApiKeyEntities(Set<ApiKeyEntity> apiKeyEntities) {
         this.apiKeyEntities = apiKeyEntities;
     }
+
 }

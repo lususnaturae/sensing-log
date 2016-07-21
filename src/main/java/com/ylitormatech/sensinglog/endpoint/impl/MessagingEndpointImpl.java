@@ -85,14 +85,10 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
         return "OK";
     }
 
+
     public String removeApiKey(String message) {
         String className = "removeApiKey";
         logger.debug(className + " key: "+ message);
-
-        /*
-        String message: Json-formatted string containing 'sensorId' of the sensor.
-        String is json-formatted integer.
-         */
 
         if (apiKeyService.removeApiKey(message) ) {
             // The above call also removes all messages for the sensor!
@@ -100,6 +96,7 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
         }
         return "FALSE";
     }
+
 
     public String activateApiKey(String message) {
         String className = "activateApiKey";
@@ -127,6 +124,7 @@ public class MessagingEndpointImpl implements MessagingEndpoint {
 
         return "OK";
     }
+
 
     public Message<String> sensorHttpPost(Message<String> msg) {
         String className = "sensorHttpPost";
