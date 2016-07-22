@@ -200,6 +200,17 @@
                            method="deactivateApiKey"/>
 
 
+    <!-- REST api definitions -->
+    <bean id="HeaderAgentInterceptor" class="com.ylitormatech.sensinglog.utils.headerAgentInterceptor"/>
+    <bean id="clientHttpRequestFactory" class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory"/>
 
+    <bean id="RestTemplate" class="org.springframework.web.client.RestTemplate">
+        <constructor-arg ref="clientHttpRequestFactory"/>
+        <property name="interceptors">
+            <list>
+                <ref bean="HeaderAgentInterceptor"/>
+            </list>
+        </property>
+    </bean>
 
 </beans>

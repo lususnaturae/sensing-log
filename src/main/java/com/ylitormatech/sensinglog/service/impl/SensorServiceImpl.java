@@ -1,11 +1,15 @@
 package com.ylitormatech.sensinglog.service.impl;
 
+import com.mongodb.BasicDBObject;
+import com.ylitormatech.sensinglog.data.entity.SensorData;
 import com.ylitormatech.sensinglog.data.entity.SensorMessage;
 import com.ylitormatech.sensinglog.data.repository.SensorRepository;
 import com.ylitormatech.sensinglog.service.SensorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * Created by Perttu Vanharanta on 1.6.2016.
@@ -19,20 +23,27 @@ public class SensorServiceImpl implements SensorService {
 
 
 
-    @Transactional(readOnly = false)
+    /*@Transactional(readOnly = false)
     public void createSensorDataEntity(String id,String value) {
-        /*SensorEntity sensorEntity = new SensorEntity();
+        SensorEntity sensorEntity = new SensorEntity();
         sensorEntity.setAPIKey(id);
         sensorEntity.setValue(Double.valueOf(value));
         sensorRepository.add(sensorEntity);
-        */
-    }
+
+    }*/
 
     @Transactional(readOnly = false)
     public void saveMessage(String message) {
 
         SensorMessage sensorMessage = new SensorMessage(message);
         sensorRepository.addMessage(sensorMessage);
+    }
+
+    @Transactional(readOnly = false)
+    public void saveMessage(BasicDBObject message) {
+        if (message != null) {
+            sensorRepository.addMessage(message);
+        }
     }
 
     @Transactional(readOnly = false)
@@ -43,10 +54,23 @@ public class SensorServiceImpl implements SensorService {
         // If start == end == 0, remove all.
         // Method return number of removed documents, or zero if nono is removed.
 
-        if (sensorId <= 0 || (start > end && end != 0) ) {
-            return sensorRepository.removeMessages(sensorId, start, end);
+        if (sensorId <= 0 || (end < start && end != 0) ) {
+            return 0;
         }
 
-        return 0;
+        return sensorRepository.removeMessages(sensorId, start, end);
     }
+
+
+    @Transactional(readOnly = false)
+    public List<SensorData> getMessages(Integer sensorId, Long start, Long end) {
+
+        if (sensorId <= 0 || end < start && end != 0) {
+            return null;
+        }
+
+        return sensorRepository.findMessages(sensorId, start, end);
+    }
+
+
 }

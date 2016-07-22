@@ -3,6 +3,8 @@ package com.ylitormatech.sensinglog.data.component;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.mongodb.BasicDBObject;
+import com.mongodb.util.JSON;
 import com.ylitormatech.sensinglog.service.ApiKeyService;
 import com.ylitormatech.sensinglog.service.SensorService;
 import org.apache.log4j.Logger;
@@ -221,7 +223,12 @@ public class SaverThread implements Runnable {
                 // Now just save the newly created jsons:
                 for (StringBuilder myMsg : newMsgs) {
                     //System.out.println(myMsg.toString());
-                    sensorService.saveMessage(myMsg.toString());
+                    //sensorService.saveMessage(myMsg.toString());
+
+                    // Convert message to DBObject:
+                    //DBObject dbObject = (DBObject) JSON.parse(myMsg.toString());
+                    BasicDBObject dbObject = (BasicDBObject) JSON.parse(myMsg.toString());
+                    sensorService.saveMessage(dbObject);
                 }
             }
         }
@@ -230,6 +237,9 @@ public class SaverThread implements Runnable {
         }
         catch (NullPointerException npe) {
             logger.error("processSave(): " + npe.getMessage());
+        }
+        catch (Exception e) {
+            logger.error("processSave(): " + e.getMessage());
         }
     }
 
