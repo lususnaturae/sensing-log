@@ -213,7 +213,7 @@
 
 
   <build>
-    <finalName>onLog</finalName>
+    <finalName>sensing-world-log</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.tomcat.maven</groupId>
