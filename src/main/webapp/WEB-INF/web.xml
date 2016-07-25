@@ -26,7 +26,6 @@
       <param-name>contextConfigLocation</param-name>
       <param-value>classpath:onLog.xml</param-value>
     </init-param>
-
     <load-on-startup>1</load-on-startup>
   </servlet>
 
@@ -34,5 +33,15 @@
     <servlet-name>onLogTest</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
+
+  <filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>com.ylitormatech.sensinglog.utils.MyCorsFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
 
 </web-app>

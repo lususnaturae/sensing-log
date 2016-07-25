@@ -5,15 +5,15 @@
   <artifactId>Sensing-World-Log</artifactId>
   <packaging>war</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>onLog Maven Webapp</name>
+  <name>sensing-world-log Maven Webapp</name>
   <url>http://maven.apache.org</url>
 
   <properties>
     <hibernate.version>4.3.11.Final</hibernate.version>
     <hibernate.validator>4.3.2.Final</hibernate.validator>
     <mysql.connector.version>5.1.21</mysql.connector.version>
-    <spring.version>4.2.6.RELEASE</spring.version>
-    <spring.integration.version>4.2.6.RELEASE</spring.integration.version>
+    <spring.version>4.2.2.RELEASE</spring.version>
+    <spring.integration.version>4.2.5.RELEASE</spring.integration.version>
     <tomcat.version>7.0.47</tomcat.version>
     <junit.version>3.8.1</junit.version>
     <jackson.version>2.7.4</jackson.version>
@@ -200,6 +200,24 @@
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-mongodb</artifactId>
       <version>1.9.1.RELEASE</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-catalina</artifactId>
+      <version>${tomcat.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>3.0.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jstl</artifactId>
+      <version>1.2</version>
     </dependency>
 
     <!-- needed for RestController -->

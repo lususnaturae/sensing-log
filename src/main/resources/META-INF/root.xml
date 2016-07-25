@@ -34,6 +34,7 @@
         </property>
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
         <property name="ignoreResourceNotFound" value="true"/>
+        <property name="environment" ref="environment"/>
     </bean>
 
 
